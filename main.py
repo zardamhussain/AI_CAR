@@ -5,6 +5,7 @@ import os
 import sys
 import pygame
 
+from brain import NeuralNetwork
 
 WIDTH = 1920 / 1.25
 HEIGHT = 1080 / 1.25
@@ -39,6 +40,8 @@ class Car:
         self.time = 0
         self.speed_set = False
 
+        self.brain = NeuralNetwork(5, 8, 4)
+
     def draw(self, screen):
         pixel_rect = self.rotated_img.get_bounding_rect()
         screen.blit(self.rotated_img, self.pos, pixel_rect)
@@ -59,9 +62,8 @@ class Car:
     def update(self, game_map):
 
         if not self.speed_set:
-            self.speed += 0.1
-            if self.speed  >= 2: self.speed_set = True
-        self.time += 1
+            self.speed = 10
+            self.speed_set = True
 
         if self.time % 60 == 0:
             self.distance += 1
@@ -72,7 +74,7 @@ class Car:
         self.pos[1] += math.sin(math.radians(360 - self.angle)) * self.speed
         self.center = [ self.pos[0] + 0.5 * CAR_SIZE_X, self.pos[1] + 0.5 * CAR_SIZE_Y ]
 
-        length = 0.5 * CAR_SIZE_X
+        length = 0.75 * CAR_SIZE_X
         left_top = [self.center[0] + math.cos(math.radians(360 - (self.angle + 30))) * length, self.center[1] + math.sin(math.radians(360 - (self.angle + 30))) * length]
         right_top = [self.center[0] + math.cos(math.radians(360 - (self.angle + 150))) * length, self.center[1] + math.sin(math.radians(360 - (self.angle + 150))) * length]
         left_bottom = [self.center[0] + math.cos(math.radians(360 - (self.angle + 210))) * length, self.center[1] + math.sin(math.radians(360 - (self.angle + 210))) * length]
@@ -115,6 +117,16 @@ class Car:
         rotated_image = rotated_image.subsurface(rotated_rectangle).copy()
         return rotated_image
 
+    def get_data(self):
+        radars = self.radar
+        return_values = [0, 0, 0, 0, 0]
+        for i, radar in enumerate(radars):
+            return_values[i] = int(radar[1] / 30)
+
+        return return_values
+
+    def predict(self):
+        return self.brain.predict(self.get_data())
 
 
 pygame.init()
@@ -143,6 +155,18 @@ while True:
             if event.key == pygame.K_s:
                 if car.speed >= 5 + 0.5:
                     car.speed -= 0.5
+
+    output = list(car.predict()[0])
+    choice = output.index(max(output))
+    if choice == 0:
+        car.angle += 10 # Left
+    elif choice == 1:
+        car.angle -= 10 # Right
+    elif choice == 2:
+        if(car.speed - 2 >= 12):
+            car.speed -= 2 # Slow Down
+    else:
+        car.speed += 2 # Speed Up
 
     screen.blit(game_map, (0, 0))
     car.draw(screen)
