@@ -1,0 +1,14 @@
+1. Add multiple levels/tracks with increasing difficulty
+2. Add background music and sound effects
+3. Add control panels (UI) to adjust car specs (speed, acceleration, etc.)
+4. Implement car customization (color, model, upgrades)
+5. Add obstacles or moving hazards on the track
+6. Add a leaderboard/high score system
+7. Implement power-ups (speed boost, shield, etc.)
+8. Add a replay or ghost car feature
+9. Add weather effects (rain, fog, etc.)
+10. Add multiplayer or AI vs AI race mode
+11. Add achievements and unlockables
+12. Add a tutorial or help screen
+13. Add camera options (zoom, follow, overview)
+14. Add lap time tracking and best lap display 
